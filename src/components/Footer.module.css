@@ -1,0 +1,42 @@
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-light);
+}
+
+.count {
+    font-size: 15px;
+    color: var(--text-light);
+}
+
+.clearButton {
+    background: var(--danger);
+    color: var(--white);
+    padding: 14px 24px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background var(--transition), transform 0.1s ease;
+}
+
+.clearButton:hover {
+    background: #c0392b;
+}
+
+.clearButton:active {
+    transform: scale(0.98);
+}
+
+@media (max-width: 480px) {
+    .footer {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+        margin-top: 24px;
+    }
+}
