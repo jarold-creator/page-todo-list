@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import TaskInput from './TaskInput';
 import TaskList from './TaskList';
@@ -9,9 +8,9 @@ import '../styles/variables.css';
 function App() {
     const [tasks, setTasks] = useLocalStorage('tasks', []);
 
-    const addTask = (text) => {
+    const addTask = ({ text, date }) => {
         if (!text.trim()) return;
-        setTasks([...tasks, { id: Date.now(), text, completed: false }]);
+        setTasks([...tasks, { id: Date.now(), text, date, completed: false }]);
     };
 
     const toggleTask = (id) => {
@@ -20,10 +19,10 @@ function App() {
         ));
     };
 
-    const editTask = (id, newText) => {
-        if (!newText.trim()) return;
+    const editTask = (id, { text, date }) => {
+        if (!text.trim()) return;
         setTasks(tasks.map(task =>
-            task.id === id ? { ...task, text: newText } : task
+            task.id === id ? { ...task, text, date } : task
         ));
     };
 
@@ -35,12 +34,19 @@ function App() {
         setTasks(tasks.filter(task => !task.completed));
     };
 
+    const sortedTasks = [...tasks].sort((a, b) => {
+        if (!a.date && !b.date) return 0;
+        if (!a.date) return 1;
+        if (!b.date) return -1;
+        return new Date(a.date) - new Date(b.date);
+    });
+
     return (
         <div className={styles.container}>
             <h1 className={styles.title}>Mis Tareas</h1>
             <TaskInput onAdd={addTask} />
             <TaskList
-                tasks={tasks}
+                tasks={sortedTasks}
                 onToggle={toggleTask}
                 onEdit={editTask}
                 onDelete={deleteTask}
