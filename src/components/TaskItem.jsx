@@ -1,32 +1,24 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
+import ConfirmModal from './ConfirmModal';
 import styles from './TaskItem.module.css';
 
-function TaskItem({ task, onToggle, onEdit, onDelete }) {
-    const [isEditing, setIsEditing] = useState(false);
+const TaskItem = memo(({ task, onToggle, onEdit, onDelete }) => {
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
     const [editText, setEditText] = useState(task.text);
     const [editDate, setEditDate] = useState(task.date || '');
 
     const handleSave = () => {
         if (editText.trim()) {
             onEdit(task.id, { text: editText, date: editDate || null });
-            setIsEditing(false);
+            setShowEditModal(false);
         }
     };
 
-    const handleKeyDown = (e) => {
-        if (e.key === 'Enter') {
-            handleSave();
-        } else if (e.key === 'Escape') {
-            setEditText(task.text);
-            setEditDate(task.date || '');
-            setIsEditing(false);
-        }
-    };
-
-    const startEditing = () => {
+    const cancelEdit = () => {
         setEditText(task.text);
         setEditDate(task.date || '');
-        setIsEditing(true);
+        setShowEditModal(false);
     };
 
     const formatDate = (dateString) => {
@@ -46,41 +38,23 @@ function TaskItem({ task, onToggle, onEdit, onDelete }) {
         return taskDate < today;
     };
 
-    return (
-        <li className={`${styles.taskItem} ${task.completed ? styles.completed : ''}`}>
-            <input
-                type="checkbox"
-                className={styles.checkbox}
-                checked={task.completed}
-                onChange={() => onToggle(task.id)}
-            />
+    const confirmDelete = () => {
+        onDelete(task.id);
+        setShowDeleteModal(false);
+    };
 
-            <div className={styles.content}>
-                {isEditing ? (
-                    <div className={styles.editGroup}>
-                        <input
-                            type="text"
-                            className={styles.editInput}
-                            value={editText}
-                            onChange={(e) => setEditText(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                            autoFocus
-                        />
-                        <input
-                            type="date"
-                            className={styles.editDate}
-                            value={editDate}
-                            onChange={(e) => setEditDate(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                        />
-                        <button
-                            className={styles.saveButton}
-                            onClick={handleSave}
-                        >
-                            Guardar
-                        </button>
-                    </div>
-                ) : (
+    return (
+        <>
+            <li className={`${styles.taskItem} ${task.completed ? styles.completed : ''}`}>
+                <input
+                    type="checkbox"
+                    className={styles.checkbox}
+                    checked={task.completed}
+                    onChange={() => onToggle(task.id)}
+                    aria-label={`Marcar como ${task.completed ? 'pendiente' : 'completada'}`}
+                />
+
+                <div className={styles.content}>
                     <div className={styles.textRow}>
                         <span className={styles.text}>{task.text}</span>
                         {task.date && (
@@ -89,27 +63,68 @@ function TaskItem({ task, onToggle, onEdit, onDelete }) {
                             </span>
                         )}
                     </div>
-                )}
-            </div>
+                </div>
 
-            {!isEditing && (
                 <div className={styles.buttonGroup}>
                     <button
                         className={styles.editButton}
-                        onClick={startEditing}
+                        onClick={() => setShowEditModal(true)}
+                        aria-label="Editar tarea"
                     >
-                        Editar
+                        ✏️
                     </button>
                     <button
                         className={styles.deleteButton}
-                        onClick={() => onDelete(task.id)}
+                        onClick={() => setShowDeleteModal(true)}
+                        aria-label="Eliminar tarea"
                     >
-                        Eliminar
+                        🗑️
                     </button>
                 </div>
-            )}
-        </li>
+            </li>
+
+            <ConfirmModal
+                isOpen={showEditModal}
+                title="Editar tarea"
+                message={
+                    <div className={styles.editForm}>
+                        <input
+                            type="text"
+                            className={styles.editInputModal}
+                            value={editText}
+                            onChange={(e) => setEditText(e.target.value)}
+                            placeholder="Descripción de la tarea"
+                            autoFocus
+                        />
+                        <input
+                            type="date"
+                            className={styles.editDateModal}
+                            value={editDate}
+                            onChange={(e) => setEditDate(e.target.value)}
+                        />
+                    </div>
+                }
+                confirmText="Guardar"
+                cancelText="Cancelar"
+                onConfirm={handleSave}
+                onCancel={cancelEdit}
+                danger={false}
+            />
+
+            <ConfirmModal
+                isOpen={showDeleteModal}
+                title="Eliminar tarea"
+                message={`¿Estás seguro de eliminar "${task.text}"? Esta acción no se puede deshacer.`}
+                confirmText="Eliminar"
+                cancelText="Cancelar"
+                onConfirm={confirmDelete}
+                onCancel={() => setShowDeleteModal(false)}
+                danger
+            />
+        </>
     );
-}
+});
+
+TaskItem.displayName = 'TaskItem';
 
 export default TaskItem;

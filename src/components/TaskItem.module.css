@@ -18,7 +18,11 @@
 
 .taskItem.completed .text {
     text-decoration: line-through;
-    color: #ccc;
+    color: var(--text-light);
+}
+
+[data-theme="dark"] .taskItem.completed .text {
+    color: #666;
 }
 
 .checkbox {
@@ -88,9 +92,19 @@
     flex-shrink: 0;
 }
 
+[data-theme="dark"] .dateBadge {
+    color: #81c784;
+    background: rgba(46, 125, 50, 0.2);
+}
+
 .dateBadge.overdue {
     color: #c62828;
     background: #ffebee;
+}
+
+[data-theme="dark"] .dateBadge.overdue {
+    color: #ef5350;
+    background: rgba(198, 40, 40, 0.2);
 }
 
 .editGroup {
@@ -139,6 +153,42 @@
     display: flex;
     gap: 4px;
     flex-shrink: 0;
+}
+
+.editForm {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: left;
+}
+
+.editInputModal {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    background: var(--bg);
+    color: var(--text);
+    transition: border-color var(--transition);
+}
+
+.editInputModal:focus {
+    border-color: var(--accent);
+}
+
+.editDateModal {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    background: var(--bg);
+    color: var(--text);
 }
 
 .editButton,
