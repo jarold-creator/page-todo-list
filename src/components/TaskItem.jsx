@@ -23,18 +23,24 @@ const TaskItem = memo(({ task, onToggle, onEdit, onDelete }) => {
 
     const formatDate = (dateString) => {
         if (!dateString) return null;
-        const date = new Date(dateString);
-        return date.toLocaleDateString('es-ES', {
-            day: 'numeric',
-            month: 'short'
-        });
+        const date = new Date(dateString + 'T00:00:00');
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const dateYear = date.getFullYear();
+        
+        const options = { day: 'numeric', month: 'short' };
+        if (dateYear !== currentYear) {
+            options.year = '2-digit';
+        }
+        
+        return date.toLocaleDateString('es-ES', options);
     };
 
     const isOverdue = () => {
         if (!task.date || task.completed) return false;
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        const taskDate = new Date(task.date);
+        const taskDate = new Date(task.date + 'T00:00:00');
         return taskDate < today;
     };
 
@@ -72,6 +78,7 @@ const TaskItem = memo(({ task, onToggle, onEdit, onDelete }) => {
                         aria-label="Editar tarea"
                     >
                         ✏️
+                        <span className={styles.tooltip}>Editar</span>
                     </button>
                     <button
                         className={styles.deleteButton}
@@ -79,6 +86,7 @@ const TaskItem = memo(({ task, onToggle, onEdit, onDelete }) => {
                         aria-label="Eliminar tarea"
                     >
                         🗑️
+                        <span className={styles.tooltip}>Eliminar</span>
                     </button>
                 </div>
             </li>
